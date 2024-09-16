@@ -11,6 +11,9 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "container-db:run": "docker run --name todolist_db --env-file .env.docker-db -p 5432:5432 -d postgres",
+    "container-db:stop": "docker stop todolist_db",
+    "container-db:start": "docker start todolist_db",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -38,7 +41,8 @@
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "mongodb": "^5.9.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.12.0",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20"
