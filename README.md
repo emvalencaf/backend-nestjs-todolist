@@ -45,4 +45,8 @@ Trata-se de um projeto de back-end para uma aplicação de lista de fazer usando
 9. As rotas públicas são decoradas com o `decorator` `Public` que ativa a condição e faz retornar o valor booleano verdadeiro:
 ![Rotas públicas](/docs/public-and-private-ends.png)
 
+# Relação das entidades
+
+![Diagrama Relacional](/docs/todolist_db_dr_diagram.png)
+
 # [Documentação no POSTMAN](https://documenter.getpostman.com/view/21997570/2sAXqpAQ3i)
