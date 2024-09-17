@@ -27,6 +27,14 @@ export class UserService {
         return user;
     }
 
+    async getById(userId: number) {
+        return this.userRepository.findOne({
+            where: {
+                id: userId,
+            },
+        });
+    }
+
     async create(createUser: CreateUserDTO) {
         const { email, password, ...otherFields } = createUser;
 

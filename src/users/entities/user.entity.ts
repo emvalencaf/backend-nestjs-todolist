@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { TaskEntity } from '../../tasks/entities/task.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -30,4 +31,6 @@ export class UserEntity {
 
     @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
     updatedAt?: Date;
+    @OneToMany(() => TaskEntity, (task) => task.user)
+    tasks: TaskEntity[];
 }

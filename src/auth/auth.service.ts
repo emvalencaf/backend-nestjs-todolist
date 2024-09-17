@@ -33,8 +33,7 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
         }
-        console.log('user: ', user);
-        console.log('JWT_SECRET env: ', process.env.JWT_SECRET);
+
         // Caso contrário, crie uma nova sessão
         const accessToken = await this.jwtService.signAsync({
             id: user.id,
