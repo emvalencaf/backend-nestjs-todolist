@@ -3,9 +3,11 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
+import { PhotoEntity } from './photo.entity';
 
 @Entity({ name: 'tasks' })
 export class TaskEntity {
@@ -32,6 +34,12 @@ export class TaskEntity {
     })
     createAt: Date;
 
+    @Column({
+        name: 'task_deadline',
+        type: 'timestamp',
+    })
+    deadline: Date;
+
     @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
     updatedAt?: Date;
 
@@ -40,4 +48,7 @@ export class TaskEntity {
     })
     @JoinColumn({ name: 'user_id' })
     user: UserEntity;
+
+    @OneToMany(() => PhotoEntity, (photo) => photo.task)
+    photos: PhotoEntity[];
 }

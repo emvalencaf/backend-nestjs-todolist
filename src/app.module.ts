@@ -14,6 +14,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TaskModule } from './tasks/task.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { TaskModule } from './tasks/task.module';
         AuthModule,
         JwtModule,
         TaskModule,
+        CloudinaryModule,
     ],
     controllers: [AppController],
     providers: [
