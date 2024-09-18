@@ -26,4 +26,14 @@ export class CloudinaryService {
             streamifier.createReadStream(file.buffer).pipe(uploadStream);
         });
     }
+
+    async deleteFile(publicId: string): Promise<void> {
+        try {
+            await cloudinary.uploader.destroy(publicId, {
+                resource_type: 'auto',
+            });
+        } catch (error) {
+            throw new Error(`Failed to delete file: ${error.message}`);
+        }
+    }
 }

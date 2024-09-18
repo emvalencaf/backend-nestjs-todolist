@@ -91,6 +91,43 @@ export class TaskService {
         return this.taskRepository.save(taskToUpdate);
     }
 
+    // Atualização de uma tarefa existente com uma foto opcional
+    async updateTaskWithPhoto(
+        taskId: number,
+        userId: number,
+        task: UpdateTaskDTO,
+        file: Express.Multer.File,
+    ): Promise<TaskEntity> {
+        const taskToUpdate = await this.taskRepository.findOne({
+            where: { id: taskId, userId },
+            relations: ['photos'], // Inclua as fotos associadas
+        });
+
+        if (!taskToUpdate) {
+            throw new NotFoundException('Task not found');
+        }
+
+        // Atualizar as propriedades da tarefa
+        Object.assign(taskToUpdate, task);
+        await this.taskRepository.save(taskToUpdate);
+
+        // Caso um novo arquivo seja enviado, faça o upload e associe à tarefa
+        const photoUploaded = await this.cloudinaryService.uploadFile(
+            file,
+            `todolist-app/${userId}/${taskId}`,
+        );
+
+        const photo = await this.createPhoto(taskId, {
+            url: photoUploaded.url,
+        });
+
+        // Adiciona a nova foto à lista de fotos
+        taskToUpdate.photos.push(photo);
+        await this.taskRepository.save(taskToUpdate);
+
+        return taskToUpdate;
+    }
+
     // Deleção de uma task, verificando se pertence ao usuário
     async delete(taskId: number, userId: number): Promise<void> {
         const taskToDelete = await this.taskRepository.findOne({
@@ -106,13 +143,21 @@ export class TaskService {
 
     // Recupera todas as tasks associadas ao userId
     async getAll(userId: number): Promise<TaskEntity[]> {
-        return this.taskRepository.find({ where: { userId } });
+        return this.taskRepository.find({
+            where: { userId },
+            relations: {
+                photos: true,
+            },
+        });
     }
 
     // Recupera uma task específica pelo ID e userId
     async getById(taskId: number, userId: number): Promise<TaskEntity> {
         const task = await this.taskRepository.findOne({
             where: { id: taskId, userId },
+            relations: {
+                photos: true,
+            },
         });
 
         if (!task) {
@@ -120,5 +165,57 @@ export class TaskService {
         }
 
         return task;
+    }
+
+    // Deletar uma foto específica pelo ID
+    async deletePhoto(
+        photoId: number,
+        taskId: number,
+        userId: number,
+    ): Promise<void> {
+        const photo = await this.photoRepository.findOne({
+            where: {
+                id: photoId,
+                taskId,
+                task: {
+                    userId,
+                },
+            },
+        });
+
+        if (!photo) {
+            throw new NotFoundException('Photo not found');
+        }
+
+        await this.cloudinaryService.deleteFile(photo.url);
+
+        await this.photoRepository.delete(photo);
+    }
+
+    // Deletar todas as fotos associadas a uma tarefa
+    async deletePhotosByTask(taskId: number, userId: number): Promise<void> {
+        const photos = await this.photoRepository.find({
+            where: {
+                taskId,
+                task: {
+                    userId,
+                },
+            },
+        });
+
+        if (photos.length === 0) {
+            throw new NotFoundException('No photos found for the task');
+        }
+
+        for (const photo of photos) {
+            await this.cloudinaryService.deleteFile(photo.url);
+        }
+
+        await this.photoRepository.delete({
+            taskId,
+            task: {
+                userId,
+            },
+        });
     }
 }

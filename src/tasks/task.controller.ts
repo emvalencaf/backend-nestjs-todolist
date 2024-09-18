@@ -36,8 +36,11 @@ export class TaskController {
         @Body() task: UpdateTaskDTO,
         @Param('taskId') taskId: number,
         @UserId('userId') userId: number,
+        @UploadedFile() @Optional() file?: Express.Multer.File,
     ) {
-        return this.taskService.update(taskId, userId, task);
+        return file
+            ? this.taskService.updateTaskWithPhoto(taskId, userId, task, file)
+            : this.taskService.update(taskId, userId, task);
     }
     @Delete('/:taskId')
     async delete(
@@ -47,14 +50,31 @@ export class TaskController {
         return this.taskService.delete(taskId, userId);
     }
 
+    @Delete('/:taskId/photos')
+    async deleteAllPhotos(
+        @Param('taskId') taskId: number,
+        @UserId('userId') userId: number,
+    ) {
+        return this.taskService.deletePhotosByTask(taskId, userId);
+    }
+
+    @Delete('/:taskId/photos/:photoId')
+    async deletePhoto(
+        @Param('taskId') taskId: number,
+        @UserId('userId') userId: number,
+        @Param('photoId') photoId: number,
+    ) {
+        return this.taskService.deletePhoto(photoId, taskId, userId);
+    }
+
     @Get()
     async getAll(@UserId('userId') userId: number) {
         return this.taskService.getAll(userId);
     }
 
-    @Get('/:userId')
+    @Get('/:taskId')
     async getById(
-        @Param('userId') taskId: number,
+        @Param('taskId') taskId: number,
         @UserId('userId') userId: number,
     ) {
         return this.taskService.getById(taskId, userId);
