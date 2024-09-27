@@ -22,11 +22,12 @@ export class AuthService {
         private readonly userService: UserService,
     ) {}
 
+    // Sign up an user
     async signUp(signUp: CreateUserDTO) {
         return this.userService.create(signUp);
     }
 
-    // Sign in as a user
+    // Sign in an a user
     async signIn(signIn: SignInUserDTO) {
         const user = await this.validateUserPassword(signIn);
 
@@ -40,7 +41,11 @@ export class AuthService {
         });
 
         return {
-            accessToken,
+            user: {
+                name: user.firstName + ' ' + user.lastName,
+                email: user.email,
+            },
+            accessToken: accessToken,
         };
     }
 
